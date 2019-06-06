@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	timeoutAnnotation = "haproxy.router.openshift.io/timeout"
+	TimeoutAnnotation = "haproxy.router.openshift.io/timeout"
 )
 
 // MakeRoutes creates OpenShift Routes from a Knative ClusterIngress
@@ -52,7 +52,7 @@ func makeRoute(ci *networkingv1alpha1.ClusterIngress, host string, index int, ru
 			// Supported time units for openshift route annotations are microseconds (us), milliseconds (ms), seconds (s), minutes (m), hours (h), or days (d)
 			// But the timeout value from clusteringress is in xmys(ex: 10m0s) format
 			// So, in order to make openshift route to work converting it into seconds.
-			annotations[timeoutAnnotation] = fmt.Sprintf("%vs", rule.HTTP.Paths[i].Timeout.Duration.Seconds())
+			annotations[TimeoutAnnotation] = fmt.Sprintf("%vs", rule.HTTP.Paths[i].Timeout.Duration.Seconds())
 		}
 	}
 
