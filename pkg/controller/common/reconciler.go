@@ -2,7 +2,9 @@ package common
 
 import (
 	"context"
+	"fmt"
 
+	maistrav1 "github.com/maistra/istio-operator/pkg/apis/maistra/v1"
 	"github.com/openshift-knative/knative-openshift-ingress/pkg/controller/resources"
 	routev1 "github.com/openshift/api/route/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -30,6 +32,22 @@ func (r *BaseIngressReconciler) ReconcileIngress(ctx context.Context, ci network
 
 	exposed := ci.GetSpec().Visibility == networkingv1alpha1.IngressVisibilityExternalIP
 	if exposed {
+		//ns, err := k8sutil.GetOperatorNamespace()
+		//if err != nil {
+		//	return err
+		//}
+		//fmt.Println("MYNS", ci.GetNamespace(), "***OPERATORNS", ns)
+		// update ServiceMeshMemberRole with route namespace
+		smmr := &maistrav1.ServiceMeshMemberRoll{}
+		err := r.Client.Get(ctx, types.NamespacedName{Name: "default", Namespace: "knative-serving-ingress"}, smmr)
+		fmt.Println("ERERREREROF SMRRR", err)
+		if err != nil {
+			return err
+		}
+		smmr.Spec.Members = append(smmr.Spec.Members, ci.GetNamespace())
+		if err := r.Client.Update(ctx, smmr);  err != nil {
+			return err
+		}
 		routes, err := resources.MakeRoutes(ci)
 		if err != nil {
 			return err

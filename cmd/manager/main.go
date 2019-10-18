@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"k8s.io/apimachinery/pkg/types"
 	"os"
 	"runtime"
 
@@ -27,6 +28,7 @@ import (
 
 	"github.com/openshift-knative/knative-openshift-ingress/pkg/util"
 	networkingv1alpha1 "knative.dev/serving/pkg/apis/networking/v1alpha1"
+	maistrav1 "github.com/maistra/istio-operator/pkg/apis/maistra/v1"
 )
 
 // Change below variables to serve metrics on different host or port.
@@ -100,6 +102,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	smmr := &maistrav1.ServiceMeshMemberRoll{}
+	err = mgr.GetClient().Get(ctx, types.NamespacedName{Name: "default", Namespace: "knative-serving-ingress"}, smmr)
+	fmt.Println("error in main", err)
 	log.Info("Registering Components.")
 
 	// Setup Scheme for all resources
